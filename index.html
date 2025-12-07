@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Диагностический тест на определение уровня английского</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- JSZip для архива с результатами -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
+    <style>
+        :root {
+            --ilizarov-green: #007f4f;
+            --ilizarov-light: #e8f5f0;
+            --ilizarov-dark: #00432a;
+            --bg: #f7f9fa;
+            --text: #222;
+            --muted: #666;
+            --border: #d0d7dd;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--ilizarov-green), var(--ilizarov-dark));
+            color: #fff;
+            padding: 1.5rem 1rem;
+        }
+
+        header h1 {
+            max-width: 960px;
+            margin: 0 auto 0.5rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        header p {
+            max-width: 960px;
+            margin: 0 auto;
+            font-size: 0.95rem;
+            color: #e0f2ea;
+        }
+
+        main {
+            max-width: 960px;
+            margin: 1.5rem auto 3rem;
+            padding: 0 1rem;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            font-size: 1.1rem;
+            color: var(--ilizarov-dark);
+        }
+
+        .card h3 {
+            margin-top: 0.75rem;
+            font-size: 1rem;
+            color: var(--ilizarov-green);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 0.5rem 0.6rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 0.95rem;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            border-radius: 999px;
+            border: none;
+            padding: 0.55rem 1.2rem;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.15s ease, transform 0.05s ease, box-shadow 0.15s ease;
+        }
+
+        .btn-primary {
+            background: var(--ilizarov-green);
+            color: #fff;
+            box-shadow: 0 2px 4px rgba(0,127,79,0.25);
+        }
+
+        .btn-primary:hover {
+            background: var(--ilizarov-dark);
+        }
+
+        .btn-secondary {
+            background: var(--ilizarov-light);
+            color: var(--ilizarov-dark);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+            box-shadow: none;
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .warning {
+            background: #fff7e6;
+            border: 1px solid #f0c36a;
+            color: #8a5a00;
+            padding: 0.75rem 0.9rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .section-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            color: var(--ilizarov-dark);
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 0.5rem;
+        }
+
+        .task-score {
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        fieldset {
+            border: none;
+            padding: 0;
+            margin: 0 0 0.75rem;
+        }
+
+        .radio-group, .tf-group {
+            margin-bottom: 0.4rem;
+            font-size: 0.95rem;
+        }
+
+        .radio-group label, .tf-group label {
+            display: inline-block;
+            margin-right: 0.75rem;
+        }
+
+        .inline-select {
+            width: auto;
+            min-width: 120px;
+            display: inline-block;
+        }
+
+        .feedback {
+            margin-top: 0.4rem;
+            font-size: 0.9rem;
+        }
+
+        .feedback.ok {
+            color: #1b7f3a;
+        }
+
+        .feedback.bad {
+            color: #b3261e;
+        }
+
+        audio {
+            width: 100%;
+            margin: 0.35rem 0 0.75rem;
+        }
+
+        .two-cols {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 0.75rem;
+        }
+
+        @media (min-width: 700px) {
+            .two-cols {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        .results-area {
+            width: 100%;
+            min-height: 160px;
+            font-family: "SF Mono", ui-monospace, Menlo, Consolas, "Courier New", monospace;
+            font-size: 0.85rem;
+        }
+
+        .disabled-overlay {
+            opacity: 0.25;
+            pointer-events: none;
+        }
+
+        .center {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Диагностический тест на определение уровня английского в профессиональной сфере для ординаторов и аспирантов НМИЦ ТО им. акад. Г.А. Илизарова Минздрава РФ</h1>
+    <p>Пожалуйста, заполните данные и внимательно прочитайте условия перед началом.</p>
+</header>
+
+<main>
+    <!-- БЛОК СТАРТА -->
+    <section class="card" id="start-section">
+        <h2>Перед началом</h2>
+        <p class="section-title">1. Персональные данные</p>
+        <div class="two-cols">
+            <div>
+                <label for="firstName">Имя</label>
+                <input type="text" id="firstName" autocomplete="off">
+            </div>
+            <div>
+                <label for="lastName">Фамилия</label>
+                <input type="text" id="lastName" autocomplete="off">
+            </div>
+        </div>
+
+        <p class="section-title" style="margin-top:1rem;">2. Важная информация</p>
+        <div class="warning">
+            <strong>Внимание!</strong><br>
+            Этот тест можно пройти <strong>ТОЛЬКО ОДИН РАЗ</strong> с одного браузера.
+            Результаты попытки будут сохранены локально в вашем браузере.
+        </div>
+        <p class="muted" style="margin-top:0.5rem;">
+            Пожалуйста, убедитесь, что у вас есть достаточно времени и стабильное интернет-подключение.
+        </p>
+
+        <button class="btn btn-primary" style="margin-top:1rem;" id="startButton">Начать тест</button>
+        <p id="alreadyDoneMsg" class="feedback bad" style="display:none;margin-top:0.75rem;">
+            Похоже, вы уже проходили этот тест с данного браузера. Повторное прохождение заблокировано.
+        </p>
+    </section>
+
+    <!-- ОСНОВНОЙ ТЕСТ -->
+    <section id="test-section" class="disabled-overlay">
+        <!-- Task 1 -->
+        <article class="card" id="task1">
+            <div class="task-header">
+                <h2>Task 1. Listening — Patient Interview (A1–A2)</h2>
+                <div class="task-score" id="task1-score"></div>
+            </div>
+            <p class="muted">Прослушайте аудио и ответьте на вопросы. Выберите один правильный вариант.</p>
+            <audio controls src="dia1.wav">
+                Ваш браузер не поддерживает аудио.
+            </audio>
+
+            <fieldset>
+                <legend>1. When did the patient fall?</legend>
+                <div class="radio-group">
+                    <label><input type="radio" name="t1q1" value="A" data-correct="true"> A. Yesterday</label>
+                    <label><input type="radio" name="t1q1" value="B"> B. Today</label>
+                    <label><input type="radio" name="t1q1" value="C"> C. Last week</label>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>2. What part of the body hurts?</legend>
+                <div class="radio-group">
+                    <label><input type="radio" name="t1q2" value="A" data-correct="true"> A. His left ankle</label>
+                    <label><input type="radio" name="t1q2" value="B"> B. His right arm</label>
+                    <label><input type="radio" name="t1q2" value="C"> C. His back</label>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>3. What type of pain does he sometimes feel?</legend>
+                <div class="radio-group">
+                    <label><input type="radio" name="t1q3" value="A"> A. Burning pain</label>
+                    <label><input type="radio" name="t1q3" value="B" data-correct="true"> B. Sharp pain</label>
+                    <label><input type="radio" name="t1q3" value="C"> C. No pain at all</label>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>4. Can the patient walk?</legend>
+                <div class="radio-group">
+                    <label><input type="radio" name="t1q4" value="A" data-correct="true"> A. Yes, but it hurts</label>
+                    <label><input type="radio" name="t1q4" value="B"> B. No, he can’t walk at all</label>
+                    <label><input type="radio" name="t1q4" value="C"> C. Yes, with no problems</label>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>5. Does the patient have swelling?</legend>
+                <div class="radio-group">
+                    <label><input type="radio" name="t1q5" value="A"> A. No, not at all</label>
+                    <label><input type="radio" name="t1q5" value="B" data-correct="true"> B. Yes, a little</label>
+                    <label><input type="radio" name="t1q5" value="C"> C. Yes, very big swelling</label>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>6. What test might the doctor order?</legend>
+                <div class="radio-group">
+                    <label><input type="radio" name="t1q6" value="A"> A. Blood test</label>
+                    <label><input type="radio" name="t1q6" value="B" data-correct="true"> B. X-ray</label>
+                    <label><input type="radio" name="t1q6" value="C"> C. MRI</label>
+                </div>
+            </fieldset>
+
+            <button class="btn btn-secondary" type="button" onclick="gradeTask1()">Проверить Task 1</button>
+            <div id="task1-feedback" class="feedback"></div>
+        </article>
+
+        <!-- Task 2 -->
+        <article class="card" id="task2">
+            <div class="task-header">
+                <h2>Task 2. Listening — X-ray Report: Hallux Valgus (A2–B1)</h2>
+                <div class="task-score" id="task2-score"></div>
+            </div>
+            <p class="muted">Прослушайте аудио и выполните задания True/False/Not stated и дополните предложения.</p>
+            <audio controls src="dia2.wav">
+                Ваш браузер не поддерживает аудио.
+            </audio>
+
+            <h3>Part 1. True / False / Not stated</h3>
+            <p class="muted">Отметьте один вариант для каждого утверждения.</p>
+
+            <div class="tf-group">
+                <p>1. The patient has had foot pain for six months.</p>
+                <label><input type="radio" name="t2s1" value="T" data-correct="true"> True</label>
+                <label><input type="radio" name="t2s1" value="F"> False</label>
+                <label><input type="radio" name="t2s1" value="N"> Not stated</label>
+            </div>
+
+            <div class="tf-group">
+                <p>2. The X-ray shows a severe hallux valgus deformity.</p>
+                <label><input type="radio" name="t2s2" value="T"> True</label>
+                <label><input type="radio" name="t2s2" value="F" data-correct="true"> False</label>
+                <label><input type="radio" name="t2s2" value="N"> Not stated</label>
+            </div>
+
+            <div class="tf-group">
+                <p>3. There is mild swelling around the joint.</p>
+                <label><input type="radio" name="t2s3" value="T" data-correct="true"> True</label>
+                <label><input type="radio" name="t2s3" value="F"> False</label>
+                <label><input type="radio" name="t2s3" value="N"> Not stated</label>
+            </div>
+
+            <div class="tf-group">
+                <p>4. A fracture is visible on the X-ray images.</p>
+                <label><input type="radio" name="t2s4" value="T"> True</label>
+                <label><input type="radio" name="t2s4" value="F" data-correct="true"> False</label>
+                <label><input type="radio" name="t2s4" value="N"> Not stated</label>
+            </div>
+
+            <div class="tf-group">
+                <p>5. Early arthritis signs include joint space narrowing.</p>
+                <label><input type="radio" name="t2s5" value="T" data-correct="true"> True</label>
+                <label><input type="radio" name="t2s5" value="F"> False</label>
+                <label><input type="radio" name="t2s5" value="N"> Not stated</label>
+            </div>
+
+            <div class="tf-group">
+                <p>6. Surgery is recommended as the first treatment option.</p>
+                <label><input type="radio" name="t2s6" value="T"> True</label>
+                <label><input type="radio" name="t2s6" value="F" data-correct="true"> False</label>
+                <label><input type="radio" name="t2s6" value="N"> Not stated</label>
+            </div>
+
+            <h3>Part 2. Finish the sentences</h3>
+            <p class="muted">Напишите короткий ответ на английском.</p>
+            <label>
+                7. The deformity seen on the X-ray is…
+                <input type="text" id="t2gap1" placeholder="Type your answer">
+            </label>
+            <label>
+                8. A small fluid collection near the joint may indicate…
+                <input type="text" id="t2gap2" placeholder="Type your answer">
+            </label>
+            <label>
+                9. Conservative treatment includes wearing…
+                <input type="text" id="t2gap3" placeholder="Type your answer">
+            </label>
+
+            <button class="btn btn-secondary" type="button" onclick="gradeTask2()">Проверить Task 2</button>
+            <div id="task2-feedback" class="feedback"></div>
+        </article>
+
+        <!-- Task 3 -->
+        <article class="card" id="task3">
+            <div class="task-header">
+                <h2>Task 3. Reading — Clavicle Dislocation (A1–A2)</h2>
+                <div class="task-score" id="task3-score"></div>
+            </div>
+            <p class="muted">Прочитайте текст и выберите подходящее предложение для каждого пропуска.</p>
+
+            <p>
+                The patient is a 27-year-old male who arrived at the emergency department after falling during a football match.
+                He reports very strong pain in his left shoulder and cannot lift his arm. (1)
+                <strong>[Select sentence]</strong>
+                The doctor sees swelling, a clear deformity, and a high position of the collarbone.
+            </p>
+            <p>
+                The patient says the pain increased immediately after the fall and is now constant. (2)
+                <strong>[Select sentence]</strong>
+                An X-ray shows a complete dislocation of the clavicle at the acromioclavicular joint. The ligaments are severely damaged, and the bones are not in the correct position.
+            </p>
+            <p>
+                The doctor explains that the patient needs hospitalization and surgery to stabilize the joint. (3)
+                <strong>[Select sentence]</strong>
+                The patient agrees and is prepared for admission to the surgical department.
+            </p>
+
+            <p><strong>Choose for each gap:</strong></p>
+            <ul class="muted">
+                <li>A. Surgery is needed to fix the clavicle and prevent further damage.</li>
+                <li>B. He felt a sharp popping sensation when he hit the ground.</li>
+                <li>C. The pain makes it difficult for him to stand or sit comfortably.</li>
+            </ul>
+
+            <div class="two-cols">
+                <label>Gap (1)
+                    <select id="t3g1" class="inline-select">
+                        <option value="">— выберите —</option>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                    </select>
+                </label>
+                <label>Gap (2)
+                    <select id="t3g2" class="inline-select">
+                        <option value="">— выберите —</option>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                    </select>
+                </label>
+                <label>Gap (3)
+                    <select id="t3g3" class="inline-select">
+                        <option value="">— выберите —</option>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                    </select>
+                </label>
+            </div>
+
+            <button class="btn btn-secondary" type="button" onclick="gradeTask3()">Проверить Task 3</button>
+            <div id="task3-feedback" class="feedback"></div>
+        </article>
+
+        <!-- Task 4 -->
+        <article class="card" id="task4">
+            <h2>Task 4. Reading — Clinical Case (A2–B1, экспертная проверка)</h2>
+            <p class="muted">Прочитайте текст и письменно ответьте на вопросы. Это задание проверяется экспертом.</p>
+
+            <p>
+                The patient is a 38-year-old male who came to the clinic with increasing pain in his right knee after a fall two days ago.
+                He slipped on wet stairs and landed directly on the knee. Since then, the pain has become stronger, especially when
+                walking or bending the leg. He also reports mild swelling and difficulty fully extending the knee.
+            </p>
+            <p>
+                A standard X-ray was performed in the emergency unit. The images show no fracture or bone displacement, and the joint surfaces
+                appear normal. However, the doctor suspects a soft-tissue injury, possibly involving the ligaments or the meniscus, because
+                the patient feels sharp pain during rotation and has reduced stability when standing.
+            </p>
+            <p>
+                The doctor recommends limiting physical activity and avoiding heavy load on the knee. To identify the exact cause of the symptoms,
+                the doctor advises the patient to undergo an MRI scan. The patient agrees and schedules the procedure for later this week.
+            </p>
+
+            <label>1. What did the X-ray show?
+                <textarea id="t4q1"></textarea>
+            </label>
+            <label>2. What type of injury does the doctor suspect?
+                <textarea id="t4q2"></textarea>
+            </label>
+            <label>3. What diagnostic step will help confirm the injury?
+                <textarea id="t4q3"></textarea>
+            </label>
+            <p class="muted">Ответы на это задание будут оцениваться преподавателем.</p>
+        </article>
+
+        <!-- Task 5 -->
+        <article class="card" id="task5">
+            <h2>Task 5. Vocabulary — Ilizarov Fixator (Wordwall)</h2>
+            <p class="muted">Выполните задание в интерактивном модуле Wordwall.</p>
+            <div class="center">
+                <iframe style="max-width:100%" src="https://wordwall.net/embed/play/103750/942/933" width="500" height="380" frameborder="0" allowfullscreen></iframe>
+            </div>
+            <p class="muted">Результат этого задания на странице не сохраняется, но вы будете использовать лексику в дальнейших ответах.</p>
+        </article>
+
+        <!-- Task 6 -->
+        <article class="card" id="task6">
+            <div class="task-header">
+                <h2>Task 6. Clinical Vocabulary (A2–B1)</h2>
+                <div class="task-score" id="task6-score"></div>
+            </div>
+            <p class="muted">Заполните пропуски, выбрав правильный вариант.</p>
+
+            <ol>
+                <li>
+                    The fracture is
+                    <select id="t6q1" class="inline-select">
+                        <option value="">— выберите —</option>
+                        <option value="stable">stable</option>
+                        <option value="swelling">swelling</option>
+                        <option value="heavy">heavy</option>
+                    </select>.
+                </li>
+                <li>
+                    The patient can’t walk because of
+                    <select id="t6q2" class="inline-select">
+                        <option value="">— выберите —</option>
+                        <option value="severe">severe</option>
+                        <option value="soft">soft</option>
+                        <option value="mild">mild</option>
+                    </select>
+                    pain.
+                </li>
+                <li>
+                    We need to
+                    <select id="t6q3" class="inline-select">
+                        <option value="">— выберите —</option>
+                        <option value="immobilize">immobilize</option>
+                        <option value="swelling">swelling</option>
+                        <option value="injury">injury</option>
+                    </select>
+                    the leg.
+                </li>
+                <li>
+                    There is
+                    <select id="t6q4" class="inline-select">
+                        <option value="">— выберите —</option>
+                        <option value="mild swelling">mild swelling</option>
+                        <option value="joint">joint</option>
+                        <option value="twist">twist</option>
+                    </select>
+                    after the operation.
+                </li>
+                <li>
+                    The doctor recommends
+                    <select id="t6q5" class="inline-select">
+                        <option value="">— выберите —</option>
+                        <option value="full">full</option>
+                        <option value="limited">limited</option>
+                        <option value="soft">soft</option>
+                    </select>
+                    weight-bearing.
+                </li>
+                <li>
+                    The patient has a
+                    <select id="t6q6" class="inline-select">
+                        <option value="">— выберите —</option>
+                        <option value="sprain">sprain</option>
+                        <option value="fracture">fracture</option>
+                        <option value="wound">wound</option>
+                    </select>
+                    of the ankle after twisting it.
+                </li>
+                <li>
+                    The X-ray shows a
+                    <select id="t6q7" class="inline-select">
+                        <option value="">— выберите —</option>
+                        <option value="dislocation">dislocation</option>
+                        <option value="soft tissue">soft tissue</option>
+                        <option value="gait">gait</option>
+                    </select>
+                    of the shoulder.
+                </li>
+                <li>
+                    The ultrasound suggests a
+                    <select id="t6q8" class="inline-select">
+                        <option value="">— выберите —</option>
+                        <option value="soft-tissue">soft-tissue</option>
+                        <option value="bone">bone</option>
+                        <option value="stable">stable</option>
+                    </select>
+                    injury.
+                </li>
+                <li>
+                    The knee feels
+                    <select id="t6q9" class="inline-select">
+                        <option value="">— выберите —</option>
+                        <option value="unstable">unstable</option>
+                        <option value="swelling">swelling</option>
+                        <option value="heavy">heavy</option>
+                    </select>
+                    when the patient stands.
+                </li>
+                <li>
+                    The doctor advises
+                    <select id="t6q10" class="inline-select">
+                        <option value="">— выберите —</option>
+                        <option value="elevating">elevating</option>
+                        <option value="walking">walking</option>
+                        <option value="loading">loading</option>
+                    </select>
+                    the limb for comfort.
+                </li>
+            </ol>
+
+            <button class="btn btn-secondary" type="button" onclick="gradeTask6()">Проверить Task 6</button>
+            <div id="task6-feedback" class="feedback"></div>
+        </article>
+
+        <!-- Task 7 -->
+        <article class="card" id="task7">
+            <div class="task-header">
+                <h2>Task 7. Grammar Basics (A1–A2)</h2>
+                <div class="task-score" id="task7-score"></div>
+            </div>
+            <p class="muted">Выберите правильный вариант.</p>
+
+            <ol>
+                <li>
+                    There
+                    <select id="t7q1" class="inline-select">
+                        <option value="">— выберите —</option>
+                        <option value="is">is</option>
+                        <option value="are">are</option>
+                    </select>
+                    pain in the knee.
+                </li>
+                <li>
+                    The doctor
+                    <select id="t7q2" class="inline-select">
+                        <option value="">— выберите —</option>
+                        <option value="examines">examines</option>
+                        <option value="is examining">is examining</option>
+                    </select>
+                    the patient now.
+                </li>
+                <li>
+                    The patient
+                    <select id="t7q3" class="inline-select">
+                        <option value="">— выберите —</option>
+                        <option value="didn’t fall">didn’t fall</option>
+                        <option value="doesn’t fall">doesn’t fall</option>
+                    </select>
+                    yesterday.
+                </li>
+                <li>
+                    He
+                    <select id="t7q4" class="inline-select">
+                        <option value="">— выберите —</option>
+                        <option value="has">has</option>
+                        <option value="have">have</option>
+                    </select>
+                    a fracture.
+                </li>
+                <li>
+                    The X-ray
+                    <select id="t7q5" class="inline-select">
+                        <option value="">— выберите —</option>
+                        <option value="was taken">was taken</option>
+                        <option value="took">took</option>
+                    </select>
+                    yesterday.
+                </li>
+                <li>
+                    There
+                    <select id="t7q6" class="inline-select">
+                        <option value="">— выберите —</option>
+                        <option value="is">is</option>
+                        <option value="are">are</option>
+                    </select>
+                    swelling around the ankle.
+                </li>
+                <li>
+                    The nurses
+                    <select id="t7q7" class="inline-select">
+                        <option value="">— выберите —</option>
+                        <option value="work">work</option>
+                        <option value="are working">are working</option>
+                    </select>
+                    in the emergency room today.
+                </li>
+                <li>
+                    The patient
+                    <select id="t7q8" class="inline-select">
+                        <option value="">— выберите —</option>
+                        <option value="has">has</option>
+                        <option value="have">have</option>
+                    </select>
+                    strong shoulder pain.
+                </li>
+                <li>
+                    The doctor
+                    <select id="t7q9" class="inline-select">
+                        <option value="">— выберите —</option>
+                        <option value="didn’t see">didn’t see</option>
+                        <option value="doesn’t see">doesn’t see</option>
+                    </select>
+                    any broken bone on the X-ray.
+                </li>
+                <li>
+                    The leg
+                    <select id="t7q10" class="inline-select">
+                        <option value="">— выберите —</option>
+                        <option value="is">is</option>
+                        <option value="are">are</option>
+                    </select>
+                    in a cast.
+                </li>
+            </ol>
+
+            <button class="btn btn-secondary" type="button" onclick="gradeTask7()">Проверить Task 7</button>
+            <div id="task7-feedback" class="feedback"></div>
+        </article>
+
+        <!-- Task 8 -->
+        <article class="card" id="task8">
+            <div class="task-header">
+                <h2>Task 8. Use of English (A2–B1)</h2>
+                <div class="task-score" id="task8-score"></div>
+            </div>
+            <p class="muted">Заполните пропуски правильной формой.</p>
+
+            <ol>
+                <li>
+                    The patient
+                    <input type="text" id="t8q1" placeholder="has been waiting" style="max-width:200px;">
+                    for 20 minutes.
+                </li>
+                <li>
+                    The leg must
+                    <input type="text" id="t8q2" placeholder="be examined" style="max-width:200px;">
+                    tomorrow.
+                </li>
+                <li>
+                    He can
+                    <input type="text" id="t8q3" placeholder="put" style="max-width:200px;">
+                    weight on the leg.
+                </li>
+                <li>
+                    The doctor advised
+                    <input type="text" id="t8q4" placeholder="to rest / resting" style="max-width:220px;">
+                    .
+                </li>
+                <li>
+                    The pain is
+                    <input type="text" id="t8q5" placeholder="worse than" style="max-width:200px;">
+                    yesterday.
+                </li>
+                <li>
+                    The wound needs
+                    <input type="text" id="t8q6" placeholder="to be cleaned" style="max-width:220px;">
+                    twice a day.
+                </li>
+                <li>
+                    The patient should
+                    <input type="text" id="t8q7" placeholder="avoid walking" style="max-width:220px;">
+                    long distances.
+                </li>
+                <li>
+                    The medication was
+                    <input type="text" id="t8q8" placeholder="prescribed" style="max-width:200px;">
+                    by the surgeon.
+                </li>
+                <li>
+                    He has
+                    <input type="text" id="t8q9" placeholder="already taken" style="max-width:220px;">
+                    the painkillers.
+                </li>
+                <li>
+                    The swelling is
+                    <input type="text" id="t8q10" placeholder="less severe" style="max-width:200px;">
+                    today.
+                </li>
+            </ol>
+
+            <button class="btn btn-secondary" type="button" onclick="gradeTask8()">Проверить Task 8</button>
+            <div id="task8-feedback" class="feedback"></div>
+        </article>
+
+        <!-- Task 9 -->
+        <article class="card" id="task9">
+            <h2>Task 9. Speaking — Voice Message (A1–B1)</h2>
+            <p class="muted">
+                Ответьте голосом на вопросы (1–2 минуты). Нажмите «Начать запись», говорите, затем нажмите «Остановить запись».
+                Запись будет добавлена в итоговый архив.
+            </p>
+            <ol>
+                <li>What is your name and your specialization?</li>
+                <li>What are your professional interests in orthopedics or trauma care?</li>
+                <li>Where did you study, and what do you do now?</li>
+                <li>What types of injuries do you see most often in your practice?</li>
+                <li>What do you like and not like about studying at the Ilizarov Center?</li>
+            </ol>
+
+            <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem;">
+                <button class="btn btn-primary" type="button" id="recordBtn">Начать запись</button>
+                <button class="btn btn-secondary" type="button" id="stopBtn" disabled>Остановить запись</button>
+            </div>
+            <div id="recordingStatus" class="muted" style="margin-top:0.5rem;"></div>
+            <div id="audioPlayback" style="margin-top:0.75rem;"></div>
+        </article>
+
+        <!-- Итоговый блок -->
+        <article class="card" id="final-card">
+            <h2>Завершение теста</h2>
+            <p class="muted">
+                После завершения всех заданий нажмите кнопку ниже, чтобы сформировать бланк с вашими ответами.
+                Будет создан архив (.zip) с текстовым файлом и аудиозаписью (если она есть). Сохраните архив и отправьте его
+                по электронной почте на адрес <strong>maria.biserova9@gmail.com</strong>.
+            </p>
+            <button class="btn btn-primary" type="button" onclick="generateResultsZip()">Сформировать архив с результатами</button>
+            <div id="final-feedback" class="feedback" style="margin-top:0.75rem;"></div>
+            <p class="muted" style="margin-top:0.75rem;">
+                Ниже вы также можете просмотреть текстовую версию своих ответов и при необходимости скопировать её.
+            </p>
+            <textarea id="resultsText" class="results-area" readonly></textarea>
+        </article>
+    </section>
+</main>
+
+<script>
+    // --- ОГРАНИЧЕНИЕ НА ОДНУ ПОПЫТКУ ---
+    const START_KEY = "ilizarov_diagnostic_started";
+
+    const startSection = document.getElementById('start-section');
+    const testSection = document.getElementById('test-section');
+    const startButton = document.getElementById('startButton');
+    const alreadyMsg = document.getElementById('alreadyDoneMsg');
+
+    function updateLockState() {
+        const started = localStorage.getItem(START_KEY);
+        if (started) {
+            alreadyMsg.style.display = 'block';
+            // тест всё равно можно просмотреть, но не перезапустить
+        } else {
+            alreadyMsg.style.display = 'none';
+        }
+    }
+
+    updateLockState();
+
+    startButton.addEventListener('click', () => {
+        const fn = document.getElementById('firstName').value.trim();
+        const ln = document.getElementById('lastName').value.trim();
+        if (!fn || !ln) {
+            alert('Пожалуйста, введите имя и фамилию перед началом теста.');
+            return;
+        }
+
+        if (!localStorage.getItem(START_KEY)) {
+            localStorage.setItem(START_KEY, new Date().toISOString());
+        }
+
+        startSection.classList.add('disabled-overlay');
+        testSection.classList.remove('disabled-overlay');
+        window.scrollTo({ top: testSection.offsetTop - 20, behavior: 'smooth' });
+        updateLockState();
+    });
+
+    // --- UTILS ---
+    function countCorrectRadios(containerId) {
+        const container = document.getElementById(containerId);
+        const radios = container.querySelectorAll('input[type="radio"][data-correct="true"]');
+        let correct = 0;
+        radios.forEach(correctRadio => {
+            const name = correctRadio.name;
+            const checked = container.querySelector('input[name="' + name + '"]:checked');
+            if (checked && checked === correctRadio) {
+                correct++;
+            }
+        });
+        return { correct, total: radios.length };
+    }
+
+    // --- Task 1 ---
+    function gradeTask1() {
+        const { correct, total } = countCorrectRadios('task1');
+        const msg = `Правильных ответов: ${correct} из ${total}.`;
+        const feedback = document.getElementById('task1-feedback');
+        const score = document.getElementById('task1-score');
+        feedback.textContent = msg;
+        score.textContent = `${correct} / ${total}`;
+        feedback.className = 'feedback ' + (correct / total >= 0.6 ? 'ok' : 'bad');
+    }
+
+    // --- Task 2 ---
+    function gradeTask2() {
+        const { correct, total } = countCorrectRadios('task2');
+
+        // Gaps
+        const gap1 = document.getElementById('t2gap1').value.trim().toLowerCase();
+        const gap2 = document.getElementById('t2gap2').value.trim().toLowerCase();
+        const gap3 = document.getElementById('t2gap3').value.trim().toLowerCase();
+
+        let gapCorrect = 0;
+
+        // 1: deformity = moderate hallux valgus
+        if (gap1.includes('hallux') && gap1.includes('valgus')) {
+            gapCorrect++;
+        }
+        // 2: irritation from pressure during walking
+        if (gap2.includes('irritation') && (gap2.includes('pressure') || gap2.includes('walking'))) {
+            gapCorrect++;
+        }
+        // 3: wider shoes / orthotic inserts
+        if (gap3.includes('wider') || gap3.includes('orthotic')) {
+            gapCorrect++;
+        }
+
+        const totalItems = total + 3;
+        const totalCorrect = correct + gapCorrect;
+
+        const feedback = document.getElementById('task2-feedback');
+        const score = document.getElementById('task2-score');
+        const msg = `Правильных: ${totalCorrect} из ${totalItems}.`;
+        feedback.textContent = msg;
+        score.textContent = `${totalCorrect} / ${totalItems}`;
+        feedback.className = 'feedback ' + (totalCorrect / totalItems >= 0.6 ? 'ok' : 'bad');
+    }
+
+    // --- Task 3 ---
+    function gradeTask3() {
+        const g1 = document.getElementById('t3g1').value;
+        const g2 = document.getElementById('t3g2').value;
+        const g3 = document.getElementById('t3g3').value;
+        let correct = 0;
+        if (g1 === 'B') correct++;
+        if (g2 === 'C') correct++;
+        if (g3 === 'A') correct++;
+
+        const feedback = document.getElementById('task3-feedback');
+        const score = document.getElementById('task3-score');
+        feedback.textContent = `Правильных ответов: ${correct} из 3.`;
+        score.textContent = `${correct} / 3`;
+        feedback.className = 'feedback ' + (correct >= 2 ? 'ok' : 'bad');
+    }
+
+    // --- Task 6 ---
+    function gradeTask6() {
+        const answers = {
+            t6q1: 'stable',
+            t6q2: 'severe',
+            t6q3: 'immobilize',
+            t6q4: 'mild swelling',
+            t6q5: 'limited',
+            t6q6: 'sprain',
+            t6q7: 'dislocation',
+            t6q8: 'soft-tissue',
+            t6q9: 'unstable',
+            t6q10: 'elevating'
+        };
+        let correct = 0;
+        let total = Object.keys(answers).length;
+        for (const id in answers) {
+            const sel = document.getElementById(id);
+            if (sel && sel.value === answers[id]) {
+                correct++;
+            }
+        }
+        const feedback = document.getElementById('task6-feedback');
+        const score = document.getElementById('task6-score');
+        feedback.textContent = `Правильных ответов: ${correct} из ${total}.`;
+        score.textContent = `${correct} / ${total}`;
+        feedback.className = 'feedback ' + (correct / total >= 0.6 ? 'ok' : 'bad');
+    }
+
+    // --- Task 7 ---
+    function gradeTask7() {
+        const answers = {
+            t7q1: 'is',
+            t7q2: 'is examining',
+            t7q3: 'didn’t fall',
+            t7q4: 'has',
+            t7q5: 'was taken',
+            t7q6: 'is',
+            t7q7: 'are working',
+            t7q8: 'has',
+            t7q9: 'didn’t see',
+            t7q10: 'is'
+        };
+        let correct = 0;
+        let total = Object.keys(answers).length;
+        for (const id in answers) {
+            const sel = document.getElementById(id);
+            if (sel && sel.value === answers[id]) {
+                correct++;
+            }
+        }
+        const feedback = document.getElementById('task7-feedback');
+        const score = document.getElementById('task7-score');
+        feedback.textContent = `Правильных ответов: ${correct} из ${total}.`;
+        score.textContent = `${correct} / ${total}`;
+        feedback.className = 'feedback ' + (correct / total >= 0.6 ? 'ok' : 'bad');
+    }
+
+    // --- Task 8 ---
+    function normalize(str) {
+        return str.trim().toLowerCase().replace(/\s+/g, ' ');
+    }
+
+    function gradeTask8() {
+        const expected = {
+            t8q1: ['has been waiting'],
+            t8q2: ['be examined'],
+            t8q3: ['put'],
+            t8q4: ['to rest', 'resting'],
+            t8q5: ['worse than'],
+            t8q6: ['to be cleaned'],
+            t8q7: ['avoid walking'],
+            t8q8: ['prescribed'],
+            t8q9: ['already taken'],
+            t8q10: ['less severe']
+        };
+
+        let correct = 0;
+        let total = Object.keys(expected).length;
+
+        for (const id in expected) {
+            const el = document.getElementById(id);
+            if (!el) continue;
+            const val = normalize(el.value);
+            const variants = expected[id];
+            if (variants.some(v => normalize(v) === val)) {
+                correct++;
+            }
+        }
+
+        const feedback = document.getElementById('task8-feedback');
+        const score = document.getElementById('task8-score');
+        feedback.textContent = `Правильных ответов: ${correct} из ${total}.`;
+        score.textContent = `${correct} / ${total}`;
+        feedback.className = 'feedback ' + (correct / total >= 0.6 ? 'ok' : 'bad');
+    }
+
+    // --- RECORDING (Task 9) ---
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let audioBlob = null;
+
+    const recordBtn = document.getElementById('recordBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const recordingStatus = document.getElementById('recordingStatus');
+    const audioPlayback = document.getElementById('audioPlayback');
+
+    recordBtn.addEventListener('click', async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            recordedChunks = [];
+            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder.ondataavailable = e => {
+                if (e.data.size > 0) {
+                    recordedChunks.push(e.data);
+                }
+            };
+            mediaRecorder.onstop = () => {
+                audioBlob = new Blob(recordedChunks, { type: 'audio/webm' });
+                const url = URL.createObjectURL(audioBlob);
+                audioPlayback.innerHTML = '';
+                const audio = document.createElement('audio');
+                audio.controls = true;
+                audio.src = url;
+                audioPlayback.appendChild(audio);
+                recordingStatus.textContent = 'Запись завершена. Проверьте аудио и сохраните архив в конце теста.';
+            };
+            mediaRecorder.start();
+            recordingStatus.textContent = 'Идёт запись… Говорите в микрофон.';
+            recordBtn.disabled = true;
+            stopBtn.disabled = false;
+        } catch (err) {
+            console.error(err);
+            alert('Не удалось получить доступ к микрофону. Проверьте настройки браузера.');
+        }
+    });
+
+    stopBtn.addEventListener('click', () => {
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop();
+            recordBtn.disabled = false;
+            stopBtn.disabled = true;
+        }
+    });
+
+    // --- GENERATE RESULTS ZIP ---
+    async function generateResultsZip() {
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName = document.getElementById('lastName').value.trim();
+        if (!firstName || !lastName) {
+            alert('Имя и фамилия должны быть заполнены.');
+            return;
+        }
+
+        // Собираем ответы в текст
+        let lines = [];
+        lines.push('===== Диагностический тест НМИЦ ТО им. акад. Г.А. Илизарова =====');
+        lines.push('ФИО: ' + firstName + ' ' + lastName);
+        lines.push('Дата/время начала (локально в браузере): ' + (localStorage.getItem(START_KEY) || 'не зафиксировано'));
+        lines.push('Дата/время формирования результата: ' + new Date().toISOString());
+        lines.push('');
+
+        // Task 1
+        lines.push('--- Task 1: Listening — Patient Interview ---');
+        for (let i = 1; i <= 6; i++) {
+            const name = 't1q' + i;
+            const checked = document.querySelector('input[name="' + name + '"]:checked');
+            lines.push(`Q${i}: ` + (checked ? checked.value : 'no answer'));
+        }
+        lines.push('');
+
+        // Task 2
+        lines.push('--- Task 2: Listening — X-ray Report ---');
+        for (let i = 1; i <= 6; i++) {
+            const name = 't2s' + i;
+            const checked = document.querySelector('input[name="' + name + '"]:checked');
+            lines.push(`Statement ${i}: ` + (checked ? checked.value : 'no answer'));
+        }
+        lines.push('Gap 7: ' + document.getElementById('t2gap1').value);
+        lines.push('Gap 8: ' + document.getElementById('t2gap2').value);
+        lines.push('Gap 9: ' + document.getElementById('t2gap3').value);
+        lines.push('');
+
+        // Task 3
+        lines.push('--- Task 3: Reading — Clavicle Dislocation ---');
+        lines.push('Gap (1): ' + (document.getElementById('t3g1').value || 'no answer'));
+        lines.push('Gap (2): ' + (document.getElementById('t3g2').value || 'no answer'));
+        lines.push('Gap (3): ' + (document.getElementById('t3g3').value || 'no answer'));
+        lines.push('');
+
+        // Task 4
+        lines.push('--- Task 4: Reading — Clinical Case (экспертная оценка) ---');
+        lines.push('Q1: ' + document.getElementById('t4q1').value.replace(/\r?\n/g, ' '));
+        lines.push('Q2: ' + document.getElementById('t4q2').value.replace(/\r?\n/g, ' '));
+        lines.push('Q3: ' + document.getElementById('t4q3').value.replace(/\r?\n/g, ' '));
+        lines.push('');
+
+        // Task 5 — только отметим, что выполнен в Wordwall
+        lines.push('--- Task 5: Vocabulary — Ilizarov Fixator (Wordwall) ---');
+        lines.push('Выполнено в Wordwall (результат не сохраняется на этой странице).');
+        lines.push('');
+
+        // Task 6
+        lines.push('--- Task 6: Clinical Vocabulary ---');
+        for (let i = 1; i <= 10; i++) {
+            const sel = document.getElementById('t6q' + i);
+            lines.push(`Q${i}: ` + (sel ? sel.value : ''));
+        }
+        lines.push('');
+
+        // Task 7
+        lines.push('--- Task 7: Grammar Basics ---');
+        for (let i = 1; i <= 10; i++) {
+            const sel = document.getElementById('t7q' + i);
+            lines.push(`Q${i}: ` + (sel ? sel.value : ''));
+        }
+        lines.push('');
+
+        // Task 8
+        lines.push('--- Task 8: Use of English ---');
+        for (let i = 1; i <= 10; i++) {
+            const el = document.getElementById('t8q' + i);
+            lines.push(`Q${i}: ` + (el ? el.value : ''));
+        }
+        lines.push('');
+
+        // Task 9
+        lines.push('--- Task 9: Speaking (voice message) ---');
+        if (audioBlob) {
+            lines.push('Аудиозапись присутствует и будет добавлена в архив как отдельный файл.');
+        } else {
+            lines.push('Аудиозапись отсутствует.');
+        }
+        lines.push('');
+
+        const resultText = lines.join('\n');
+        document.getElementById('resultsText').value = resultText;
+
+        // Формируем ZIP
+        const zip = new JSZip();
+        zip.file('results.txt', resultText, { binary: false });
+
+        if (audioBlob) {
+            const arrayBuffer = await audioBlob.arrayBuffer();
+            zip.file('speaking_task.webm', arrayBuffer, { binary: true });
+        }
+
+        const content = await zip.generateAsync({ type: 'blob' });
+        const downloadName = `diagnostic_test_${lastName}_${firstName}.zip`;
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(content);
+        link.download = downloadName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        const finalFb = document.getElementById('final-feedback');
+        finalFb.textContent = 'Архив с результатами сформирован. Пожалуйста, отправьте его по электронной почте на адрес: maria.biserova9@gmail.com';
+        finalFb.className = 'feedback ok';
+    }
+</script>
+</body>
+</html>
