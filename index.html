@@ -336,8 +336,7 @@
                 </div>
             </fieldset>
 
-            <button class="btn btn-secondary" type="button" onclick="gradeTask1()">Проверить Task 1</button>
-            <div id="task1-feedback" class="feedback"></div>
+
         </article>
 
         <!-- Task 2 -->
@@ -411,8 +410,7 @@
                 <input type="text" id="t2gap3" placeholder="Type your answer">
             </label>
 
-            <button class="btn btn-secondary" type="button" onclick="gradeTask2()">Проверить Task 2</button>
-            <div id="task2-feedback" class="feedback"></div>
+
         </article>
 
         <!-- Task 3 -->
@@ -474,8 +472,7 @@
                 </label>
             </div>
 
-            <button class="btn btn-secondary" type="button" onclick="gradeTask3()">Проверить Task 3</button>
-            <div id="task3-feedback" class="feedback"></div>
+
         </article>
 
         <!-- Task 4 -->
@@ -521,118 +518,138 @@
         </article>
 
         <!-- Task 6 -->
-        <article class="card" id="task6">
-            <div class="task-header">
-                <h2>Task 6. Clinical Vocabulary (A2–B1)</h2>
-                <div class="task-score" id="task6-score"></div>
-            </div>
-            <p class="muted">Заполните пропуски, выбрав правильный вариант.</p>
+<article class="card" id="task6">
+  <h2>Task 6. Use of English — Traumatology Collocations (A2–B1)</h2>
+  <p class="muted">
+    Each group of four words can be linked by ONE medical term. Choose the missing word from the options.
+  </p>
 
-            <ol>
-                <li>
-                    The fracture is
-                    <select id="t6q1" class="inline-select">
-                        <option value="">— выберите —</option>
-                        <option value="stable">stable</option>
-                        <option value="swelling">swelling</option>
-                        <option value="heavy">heavy</option>
-                    </select>.
-                </li>
-                <li>
-                    The patient can’t walk because of
-                    <select id="t6q2" class="inline-select">
-                        <option value="">— выберите —</option>
-                        <option value="severe">severe</option>
-                        <option value="soft">soft</option>
-                        <option value="mild">mild</option>
-                    </select>
-                    pain.
-                </li>
-                <li>
-                    We need to
-                    <select id="t6q3" class="inline-select">
-                        <option value="">— выберите —</option>
-                        <option value="immobilize">immobilize</option>
-                        <option value="swelling">swelling</option>
-                        <option value="injury">injury</option>
-                    </select>
-                    the leg.
-                </li>
-                <li>
-                    There is
-                    <select id="t6q4" class="inline-select">
-                        <option value="">— выберите —</option>
-                        <option value="mild swelling">mild swelling</option>
-                        <option value="joint">joint</option>
-                        <option value="twist">twist</option>
-                    </select>
-                    after the operation.
-                </li>
-                <li>
-                    The doctor recommends
-                    <select id="t6q5" class="inline-select">
-                        <option value="">— выберите —</option>
-                        <option value="full">full</option>
-                        <option value="limited">limited</option>
-                        <option value="soft">soft</option>
-                    </select>
-                    weight-bearing.
-                </li>
-                <li>
-                    The patient has a
-                    <select id="t6q6" class="inline-select">
-                        <option value="">— выберите —</option>
-                        <option value="sprain">sprain</option>
-                        <option value="fracture">fracture</option>
-                        <option value="wound">wound</option>
-                    </select>
-                    of the ankle after twisting it.
-                </li>
-                <li>
-                    The X-ray shows a
-                    <select id="t6q7" class="inline-select">
-                        <option value="">— выберите —</option>
-                        <option value="dislocation">dislocation</option>
-                        <option value="soft tissue">soft tissue</option>
-                        <option value="gait">gait</option>
-                    </select>
-                    of the shoulder.
-                </li>
-                <li>
-                    The ultrasound suggests a
-                    <select id="t6q8" class="inline-select">
-                        <option value="">— выберите —</option>
-                        <option value="soft-tissue">soft-tissue</option>
-                        <option value="bone">bone</option>
-                        <option value="stable">stable</option>
-                    </select>
-                    injury.
-                </li>
-                <li>
-                    The knee feels
-                    <select id="t6q9" class="inline-select">
-                        <option value="">— выберите —</option>
-                        <option value="unstable">unstable</option>
-                        <option value="swelling">swelling</option>
-                        <option value="heavy">heavy</option>
-                    </select>
-                    when the patient stands.
-                </li>
-                <li>
-                    The doctor advises
-                    <select id="t6q10" class="inline-select">
-                        <option value="">— выберите —</option>
-                        <option value="elevating">elevating</option>
-                        <option value="walking">walking</option>
-                        <option value="loading">loading</option>
-                    </select>
-                    the limb for comfort.
-                </li>
-            </ol>
+  <ol>
+    <li>
+      <strong>sharp / chronic / radiating / postoperative</strong><br>
+      Missing word:
+      <select id="t6u1" class="inline-select">
+        <option value="">— выберите —</option>
+        <option value="pain">pain</option>
+        <option value="injury">injury</option>
+        <option value="joint">joint</option>
+        <option value="fracture">fracture</option>
+      </select>
+    </li>
 
-            <button class="btn btn-secondary" type="button" onclick="gradeTask6()">Проверить Task 6</button>
-            <div id="task6-feedback" class="feedback"></div>
-        </article>
+    <li>
+      <strong>open / comminuted / stable / displaced</strong><br>
+      Missing word:
+      <select id="t6u2" class="inline-select">
+        <option value="">— выберите —</option>
+        <option value="fracture">fracture</option>
+        <option value="sprain">sprain</option>
+        <option value="swelling">swelling</option>
+        <option value="cast">cast</option>
+      </select>
+    </li>
+
+    <li>
+      <strong>external / circular / fixation / bone</strong><br>
+      Missing word:
+      <select id="t6u3" class="inline-select">
+        <option value="">— выберите —</option>
+        <option value="frame">frame</option>
+        <option value="pain">pain</option>
+        <option value="ligament">ligament</option>
+        <option value="crutch">crutch</option>
+      </select>
+    </li>
+
+    <li>
+      <strong>length / alignment / axis / deformity</strong><br>
+      Missing word:
+      <select id="t6u4" class="inline-select">
+        <option value="">— выберите —</option>
+        <option value="limb">limb</option>
+        <option value="bone">bone</option>
+        <option value="joint">joint</option>
+        <option value="muscle">muscle</option>
+      </select>
+    </li>
+
+    <li>
+      <strong>pain / opioid / non-opioid / postoperative</strong><br>
+      Missing word:
+      <select id="t6u5" class="inline-select">
+        <option value="">— выберите —</option>
+        <option value="management">management</option>
+        <option value="fracture">fracture</option>
+        <option value="reduction">reduction</option>
+        <option value="infection">infection</option>
+      </select>
+    </li>
+
+    <li>
+      <strong>muscle / ligament / tendon / fascia</strong><br>
+      Missing word:
+      <select id="t6u6" class="inline-select">
+        <option value="">— выберите —</option>
+        <option value="injury">injury</option>
+        <option value="fracture">fracture</option>
+        <option value="implant">implant</option>
+        <option value="pain">pain</option>
+      </select>
+    </li>
+
+    <li>
+      <strong>gradual / controlled / axial / bone</strong><br>
+      Missing word:
+      <select id="t6u7" class="inline-select">
+        <option value="">— выберите —</option>
+        <option value="distraction">distraction</option>
+        <option value="rotation">rotation</option>
+        <option value="infection">infection</option>
+        <option value="compression">compression</option>
+      </select>
+    </li>
+
+    <li>
+      <strong>weight-bearing / mobility / stability / function</strong><br>
+      Missing word:
+      <select id="t6u8" class="inline-select">
+        <option value="">— выберите —</option>
+        <option value="limb">limb</option>
+        <option value="pain">pain</option>
+        <option value="fracture">fracture</option>
+        <option value="surgery">surgery</option>
+      </select>
+    </li>
+
+    <li>
+      <strong>emergency / planned / revision / orthopedic</strong><br>
+      Missing word:
+      <select id="t6u9" class="inline-select">
+        <option value="">— выберите —</option>
+        <option value="surgery">surgery</option>
+        <option value="splint">splint</option>
+        <option value="wound">wound</option>
+        <option value="diagnosis">diagnosis</option>
+      </select>
+    </li>
+
+    <li>
+      <strong>regeneration / lengthening / transport / union</strong><br>
+      Missing word:
+      <select id="t6u10" class="inline-select">
+        <option value="">— выберите —</option>
+        <option value="bone">bone</option>
+        <option value="skin">skin</option>
+        <option value="nerve">nerve</option>
+        <option value="blood">blood</option>
+      </select>
+    </li>
+  </ol>
+
+  <p class="muted">
+    Примечание: самопроверки нет. Ответы сохраняются в итоговый архив.
+  </p>
+</article>
 
         <!-- Task 7 -->
         <article class="card" id="task7">
@@ -734,9 +751,6 @@
                     in a cast.
                 </li>
             </ol>
-
-            <button class="btn btn-secondary" type="button" onclick="gradeTask7()">Проверить Task 7</button>
-            <div id="task7-feedback" class="feedback"></div>
         </article>
 
                <!-- Task 8 -->
@@ -810,8 +824,7 @@
                 </li>
             </ol>
 
-            <button class="btn btn-secondary" type="button" onclick="gradeTask8()">Проверить Task 8</button>
-            <div id="task8-feedback" class="feedback"></div>
+
         </article>
 
 
